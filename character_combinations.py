@@ -1,10 +1,7 @@
 # 字牌類
 from tiles import Tile, TileType
-from meld import Meld, MeldType
 from point_combination import PointCombination, ScoredCombination
-from calculate import split_to_groups
 
-character_combinations = []
 
 # 無字
 class NoCharacter(PointCombination):
@@ -18,8 +15,6 @@ class NoCharacter(PointCombination):
         if all(meld.tile_type != TileType.FAAN for meld in melds) and all(tile.tile_type != TileType.FAAN for tile in eye):
             res += self.score()
         return res
-
-character_combinations.append(NoCharacter())
 
 # 風/位
 class PositionCharacter(PointCombination):
@@ -36,8 +31,6 @@ class PositionCharacter(PointCombination):
                 res.append(self.score(used_melds = [meld]))
         return res
 
-character_combinations.append(PositionCharacter())
-
 # 三元牌
 class FaanCharacter(PointCombination):
     def __init__(self):
@@ -51,8 +44,6 @@ class FaanCharacter(PointCombination):
             if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value >= 5:
                 res.append(self.score(used_melds = [meld]))
         return res
-
-character_combinations.append(FaanCharacter())
 
 # 小三元
 class SmallThreeCharacter(PointCombination):
@@ -72,7 +63,6 @@ class SmallThreeCharacter(PointCombination):
         if len(used_melds) == 2:
             res.append(self.score(used_melds = used_melds, used_eye = eye))
         return res
-character_combinations.append(SmallThreeCharacter())
 
 # 大三元
 class BigThreeCharacter(PointCombination):
@@ -95,45 +85,10 @@ class BigThreeCharacter(PointCombination):
             res.append(self.score(used_melds = used_melds, exclusions = exclusions))
         return res
 
-character_combinations.append(BigThreeCharacter())
-
-mahjong_hand_1 = [
-        "1s", "1s", "1s", "2s", "2s",
-        "2s", "3s", "3s", "3s", "4s",
-        "4s", "4s", "5s", "5s", "5s",
-        "6s", "6s"
-    ]
-
-# mahjong_hand_2 = [
-#         "1x", "1x", "1x", "2x", "2x",
-#         "2x", "3x", "3x", "3x", "4x",
-#         "4x", "4x", "5x", "5x", "5x",
-#         "6x", "6x"
-#     ]
-
-mahjong_hand_2 = [
-        "1x", "1x", "1x", "2x", "2x",
-        "2x", "3x", "3x", "6x", "7x",
-        "7x", "7x", "5x", "5x", "5x",
-        "6x", "6x"
-    ]
-
-result = split_to_groups(mahjong_hand_2)
-
-for m, e in result:
-    print(m, e)
-    points = []
-    for combination in character_combinations:
-        s = combination.evaluate(m, e)
-        if len(s) > 0:
-            points.extend(s)
-    for point in points:
-        if point.exclusions:
-            for exclusion in point.exclusions:
-                if exclusion in points:
-                    points.remove(exclusion)
-
-    for f in points:
-        print(f)
-        
+def get_character_combinations():
+    yield NoCharacter()
+    yield PositionCharacter()
+    yield FaanCharacter()
+    yield SmallThreeCharacter()
+    yield BigThreeCharacter()
 
