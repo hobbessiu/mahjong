@@ -85,10 +85,30 @@ class BigThreeCharacter(PointCombination):
             res.append(self.score(used_melds = used_melds, exclusions = exclusions))
         return res
 
+# 小三風
+class SmallThreeDirection(PointCombination):
+    def __init__(self):
+        name = "小三風"
+        point = 15
+        super().__init__(name, point)
+
+    def evaluate(self, melds, eye):
+        res = []
+        isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
+
+        if not isDirection(eye[0]):
+            return res
+        used_melds = [meld for meld in melds if isDirection(meld.tiles[0])]
+
+        if len(used_melds) == 2:
+            res.append(self.score(used_melds = used_melds, used_eye = eye))
+        return res
+
 def get_character_combinations():
     yield NoCharacter()
     yield PositionCharacter()
     yield FaanCharacter()
     yield SmallThreeCharacter()
     yield BigThreeCharacter()
+    yield SmallThreeDirection()
 
