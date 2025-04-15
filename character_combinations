@@ -1,0 +1,139 @@
+# 字牌類
+from tiles import Tile, TileType
+from meld import Meld, MeldType
+from point_combination import PointCombination, ScoredCombination
+from calculate import split_to_groups
+
+character_combinations = []
+
+# 無字
+class NoCharacter(PointCombination):
+    def __init__(self):
+        name = "無字"
+        point = 1
+        super().__init__(name, point)
+
+    def evaluate(self, melds, eye):
+        res = []
+        if all(meld.tile_type != TileType.FAAN for meld in melds) and all(tile.tile_type != TileType.FAAN for tile in eye):
+            res += self.score()
+        return res
+
+character_combinations.append(NoCharacter())
+
+# 風/位
+class PositionCharacter(PointCombination):
+    def __init__(self):
+        name = "風"
+        point = 1
+        remark = "正風/位 + 1番"
+        super().__init__(name, point, remark)
+
+    def evaluate(self, melds, eye):
+        res = []
+        for meld in melds:
+            if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value <= 4:
+                res.append(self.score(used_melds = [meld]))
+        return res
+
+character_combinations.append(PositionCharacter())
+
+# 三元牌
+class FaanCharacter(PointCombination):
+    def __init__(self):
+        name = "三元牌"
+        point = 2
+        super().__init__(name, point)
+
+    def evaluate(self, melds, eye):
+        res = []
+        for meld in melds:
+            if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value >= 5:
+                res.append(self.score(used_melds = [meld]))
+        return res
+
+character_combinations.append(FaanCharacter())
+
+# 小三元
+class SmallThreeCharacter(PointCombination):
+    def __init__(self):
+        name = "小三元"
+        point = 20
+        super().__init__(name, point)
+
+    def evaluate(self, melds, eye):
+        res = []
+        isThreeCharacter = lambda t: t.tile_type == TileType.FAAN and t.tile_value >= 5
+
+        if not isThreeCharacter(eye[0]):
+            return res
+        used_melds = [meld for meld in melds if isThreeCharacter(meld.tiles[0])]
+
+        if len(used_melds) == 2:
+            res.append(self.score(used_melds = used_melds, used_eye = eye))
+        return res
+character_combinations.append(SmallThreeCharacter())
+
+# 大三元
+class BigThreeCharacter(PointCombination):
+    def __init__(self):
+        name = "大三元"
+        point = 40
+        super().__init__(name, point)
+
+    def evaluate(self, melds, eye):
+        res = []
+        isThreeCharacter = lambda t: t.tile_type == TileType.FAAN and t.tile_value >= 5
+
+        used_melds = [meld for meld in melds if isThreeCharacter(meld.tiles[0])]
+
+        if len(used_melds) == 3:
+            exclusions = []
+            for meld in used_melds:
+                exclusions.append(ScoredCombination(FaanCharacter(), used_melds = [meld]))
+
+            res.append(self.score(used_melds = used_melds, exclusions = exclusions))
+        return res
+
+character_combinations.append(BigThreeCharacter())
+
+mahjong_hand_1 = [
+        "1s", "1s", "1s", "2s", "2s",
+        "2s", "3s", "3s", "3s", "4s",
+        "4s", "4s", "5s", "5s", "5s",
+        "6s", "6s"
+    ]
+
+# mahjong_hand_2 = [
+#         "1x", "1x", "1x", "2x", "2x",
+#         "2x", "3x", "3x", "3x", "4x",
+#         "4x", "4x", "5x", "5x", "5x",
+#         "6x", "6x"
+#     ]
+
+mahjong_hand_2 = [
+        "1x", "1x", "1x", "2x", "2x",
+        "2x", "3x", "3x", "6x", "7x",
+        "7x", "7x", "5x", "5x", "5x",
+        "6x", "6x"
+    ]
+
+result = split_to_groups(mahjong_hand_2)
+
+for m, e in result:
+    print(m, e)
+    points = []
+    for combination in character_combinations:
+        s = combination.evaluate(m, e)
+        if len(s) > 0:
+            points.extend(s)
+    for point in points:
+        if point.exclusions:
+            for exclusion in point.exclusions:
+                if exclusion in points:
+                    points.remove(exclusion)
+
+    for f in points:
+        print(f)
+        
+
