@@ -2,8 +2,9 @@ from tiles import Tile, TileType
 from collections import Counter, OrderedDict
 from itertools import combinations
 from meld import Meld
+from typing import List
 
-def split_to_groups(mahjong_hand: list[str]):
+def split_to_groups(mahjong_hand: List[Tile]):
     """
     Splits the mahjong hand of 17 tiles into exactly 5 melds and one eye.
     All tiles must be used.
@@ -34,7 +35,7 @@ def is_eye(group):
     """Check if a group of 2 tiles is a valid eye."""
     return len(group) == 2 and group[0] == group[1]
 
-def split_to_groups(mahjong_hand):
+def split_to_groups(mahjong_hand: List[Tile]):
     def extract_chow(current_tile, remaining_tiles, remaining_tiles_count):
         melds.append(Meld([current_tile, current_tile.next_tile(), current_tile.next_tile().next_tile()]))
         remaining_tiles_count.subtract([current_tile, current_tile.next_tile(), current_tile.next_tile().next_tile()])
@@ -55,7 +56,7 @@ def split_to_groups(mahjong_hand):
     if len(mahjong_hand) != 17:
         raise ValueError("A mahjong hand must contain exactly 17 tiles.")
     
-    tiles = sorted([Tile.from_string(tile) for tile in mahjong_hand])
+    tiles = sorted(mahjong_hand)
 
     tile_counts = Counter(tiles)
     possible_eyes = [tile for tile, count in tile_counts.items() if count >= 2]
@@ -144,18 +145,20 @@ if __name__ == "__main__":
         "7s", "7s"
     ]
 
-    mahjong_hand_2 = [
+    mahjong_hand = [
         "1s", "1s", "1s", "2s", "2s",
         "2s", "3s", "3s", "3s", "4s",
         "4s", "4s", "5s", "5s", "5s",
         "6s", "6s"
     ]
 
+    tiles = [Tile.from_string(tile) for tile in mahjong_hand]
+
     print("Input:")
-    print(sorted([Tile.from_string(tile) for tile in mahjong_hand_2]))
+    print(tiles)
 
     print("")
     print("Output:")
-    result = split_to_groups(mahjong_hand_2)
+    result = split_to_groups(tiles)
     for (melds, eye) in result:
         print(melds + eye)
