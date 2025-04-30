@@ -7,9 +7,10 @@ class TileType(Enum):
     FAAN = "x"
 
 class Tile:
-    def __init__(self, tile_value: int, tile_type: TileType):
+    def __init__(self, tile_value: int, tile_type: TileType, is_open: bool = False):
         self.tile_value = tile_value
         self.tile_type = tile_type
+        self.is_open = is_open
         self.tile_string = str(tile_value) + tile_type.value
     
     @classmethod
@@ -33,6 +34,8 @@ class Tile:
                 return cls(tile_value, tile_type)
         raise ValueError(f"Invalid tile unicode {tile_unicode}.")
 
+    def set_open(self):
+        self.is_open = True
 
     def next_tile(self):
         if self.tile_type == TileType.FAAN:
