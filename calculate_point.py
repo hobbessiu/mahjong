@@ -2,23 +2,25 @@ from calculate import split_to_groups
 from tiles import Tile
 from combinations.character_combinations import get_character_combinations
 from combinations.combo_combination import get_combo_combinations
+from combinations.dragon_combinations import get_dragon_combinations
 
 def get_all_combinations():
-    
-
     for combo in get_combo_combinations():
         yield combo
 
     for character in get_character_combinations():
         yield character
 
+    for dragon in get_dragon_combinations():
+        yield dragon
+
 def calculate(mahjong_hand):
     result = split_to_groups(mahjong_hand)
-    for m, e in result:
-        print(m, e)
+    for m, e, f in result:
+        print(m, e, f)
         points = []
         for combination in get_all_combinations():
-            s = combination.evaluate(m, e)
+            s = combination.evaluate(m, e, f)
             if s and len(s) > 0:
                 points.extend(s)
         res = points.copy()

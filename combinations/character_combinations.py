@@ -1,4 +1,4 @@
-# 字牌類
+"""字牌類"""
 from tiles import Tile, TileType
 from combinations.point_combination import PointCombination, ScoredCombination
 
@@ -10,10 +10,10 @@ class NoCharacter(PointCombination):
         point = 1
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         if all(meld.tile_type != TileType.FAAN for meld in melds) and all(tile.tile_type != TileType.FAAN for tile in eye):
-            res += self.score()
+            res.append(self.score())
         return res
 
 class PositionCharacter(PointCombination):
@@ -24,7 +24,7 @@ class PositionCharacter(PointCombination):
         remark = "正風/位 + 1番"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         for meld in melds:
             if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value <= 4:
@@ -38,7 +38,7 @@ class FaanCharacter(PointCombination):
         point = 2
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         for meld in melds:
             if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value >= 5:
@@ -52,7 +52,7 @@ class SmallThreeCharacter(PointCombination):
         point = 20
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         isThreeCharacter = lambda t: t.tile_type == TileType.FAAN and t.tile_value >= 5
 
@@ -74,7 +74,7 @@ class BigThreeCharacter(PointCombination):
         point = 40
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         isThreeCharacter = lambda t: t.tile_type == TileType.FAAN and t.tile_value >= 5
 
@@ -95,7 +95,7 @@ class SmallThreeDirection(PointCombination):
         point = 15
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -118,7 +118,7 @@ class BigThreeDirection(PointCombination):
         point = 30
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -139,7 +139,7 @@ class SmallFourDirection(PointCombination):
         point = 60
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -160,7 +160,7 @@ class BigFourDirection(PointCombination):
         point = 90
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -181,7 +181,7 @@ class AllCharacter(PointCombination):
         point = 120
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye):
+    def evaluate(self, melds, eye, flowers):
         res = []
         if all(meld.tile_type == TileType.FAAN for meld in melds) and all(tile.tile_type == TileType.FAAN for tile in eye):
             exclusions = []

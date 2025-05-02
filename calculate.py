@@ -36,6 +36,8 @@ def is_eye(group):
     return len(group) == 2 and group[0] == group[1]
 
 def split_to_groups(mahjong_hand: List[Tile]):
+    flowers = [tile for tile in mahjong_hand if tile.tile_type == TileType.FLOWER]
+    mahjong_hand = [tile for tile in mahjong_hand if tile.tile_type != TileType.FLOWER]
     def extract_chow(current_tile, remaining_tiles, remaining_tiles_count):
         melds.append(Meld([current_tile, current_tile.next_tile(), current_tile.next_tile().next_tile()]))
         remaining_tiles_count.subtract([current_tile, current_tile.next_tile(), current_tile.next_tile().next_tile()])
@@ -63,8 +65,6 @@ def split_to_groups(mahjong_hand: List[Tile]):
     if not possible_eyes:
         raise ValueError("No possible eyes in the hand.")
 
-    all_tiles = list(tile_counts.elements())
-
     possible_eye__values_dict = {0: [3,6,9],
                                  1: [2,5,8],
                                  2: [1,4,7],}
@@ -80,10 +80,10 @@ def split_to_groups(mahjong_hand: List[Tile]):
         extra_attempts = []
         while True:
             melds = []
-            remaining_tiles = list(all_tiles)
+            remaining_tiles = tiles.copy()
             remaining_tiles_count = Counter(remaining_tiles)
 
-            eye = [possible_eye, possible_eye]
+            eye = [tile for tile in remaining_tiles if tile == possible_eye][0:2]
             # remaining_tiles.remove(possible_eye)
             # remaining_tiles.remove(possible_eye)
             
@@ -123,10 +123,10 @@ def split_to_groups(mahjong_hand: List[Tile]):
             
             if len(melds) == 5:
                 melds.sort()
-                existing_melds = [m for m,e in result]
+                existing_melds = [m for m,e,f in result]
 
                 if melds not in existing_melds:
-                    result.append((melds, eye))
+                    result.append((melds, eye, flowers))
 
         
             if len(extra_attempts) == 0:
