@@ -52,8 +52,8 @@ st.write('''
     <style>
     [data-testid="column"] {
         flex: 0 0 auto !important; /* Prevent columns from resizing */
-        width: calc(5s0% - 1rem); /* Fixed width based on proportions */
-        min-width: calc(20% - 1rem) !important;
+        width: calc(50% - 1rem); /* Fixed width based on proportions */
+        min-width: calc(50% - 1rem) !important;
     }
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
@@ -64,8 +64,8 @@ st.write('''
     }
     [data-testid="stVerticalBlock"] {
         width: 100px ;
-        flex: 1 1 calc(20% - 1rem) !important;
-        min-width: calc(20% - 1rem) !important;
+        flex: 1 1 calc(50% - 1rem) !important;
+        min-width: calc(50% - 1rem) !important;
     }
     </style>
     ''', unsafe_allow_html=True)
