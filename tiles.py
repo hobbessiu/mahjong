@@ -5,11 +5,20 @@ class TileType(Enum):
     TUNG = "t"
     MAAN = "m"
     FAAN = "x"
+    FLOWER = "z"
 
 class Tile:
-    def __init__(self, tile_value: int, tile_type: TileType):
+    unicode_dict = {
+            TileType.SOK: '🀐🀑🀒🀓🀔🀕🀖🀗🀘',
+            TileType.TUNG: '🀙🀚🀛🀜🀝🀞🀟🀠🀡',
+            TileType.MAAN: '🀇🀈🀉🀊🀋🀌🀍🀎🀏',
+            TileType.FAAN: '🀀🀁🀂🀃🀄🀅🀆',
+            TileType.FLOWER: '🀢🀣🀥🀤🀦🀧🀨🀩'}
+    
+    def __init__(self, tile_value: int, tile_type: TileType, is_open: bool = False):
         self.tile_value = tile_value
         self.tile_type = tile_type
+        self.is_open = is_open
         self.tile_string = str(tile_value) + tile_type.value
     
     @classmethod
@@ -21,21 +30,17 @@ class Tile:
     
     @classmethod
     def from_unicode(cls, tile_unicode: str):
-        unicode_dict = {
-            TileType.SOK: '🀐🀑🀒🀓🀔🀕🀖🀗🀘',
-            TileType.TUNG: '🀙🀚🀛🀜🀝🀞🀟🀠🀡',
-            TileType.MAAN: '🀇🀈🀉🀊🀋🀌🀍🀎🀏',
-            TileType.FAAN: '🀀🀁🀂🀃🀄︎🀅🀆'}
-        
-        for tile_type, unicode_string in unicode_dict.items():
+        for tile_type, unicode_string in cls.unicode_dict.items():
             if tile_unicode in unicode_string:
                 tile_value = unicode_string.index(tile_unicode) + 1
                 return cls(tile_value, tile_type)
         raise ValueError(f"Invalid tile unicode {tile_unicode}.")
 
+    def set_open(self):
+        self.is_open = True
 
     def next_tile(self):
-        if self.tile_type == TileType.FAAN:
+        if self.tile_type == TileType.FAAN or self.tile_type == TileType.FLOWER:
             return None
         if self.tile_value == 9:
             return None
@@ -55,29 +60,38 @@ class Tile:
         return hash((self.tile_value, self.tile_type.value))
 
     def __lt__(self, other):
+        if self == other:
+            return self.is_open > other.is_open
         if self.tile_type == other.tile_type:
             return self.tile_value < other.tile_value
         return self.tile_type.value < other.tile_type.value
 
     def to_unicode(self):
-        unicode_dict = {
-            TileType.SOK: '🀐🀑🀒🀓🀔🀕🀖🀗🀘',
-            TileType.TUNG: '🀙🀚🀛🀜🀝🀞🀟🀠🀡',
-            TileType.MAAN: '🀇🀈🀉🀊🀋🀌🀍🀎🀏',
-            TileType.FAAN: '🀀🀁🀂🀃🀄︎🀅🀆'}
 
         if self.tile_string == "6x":
             return "\U0001F005"
         elif self.tile_string == "7x":
             return '🀆'
-        return unicode_dict[self.tile_type][self.tile_value - 1]
+        return self.unicode_dict[self.tile_type][self.tile_value - 1]
 
     def __str__(self):
         chinese_characters = {
             TileType.SOK: "索",
             TileType.TUNG: "筒",
             TileType.MAAN: "萬",
-            TileType.FAAN: "字"
+            TileType.FAAN: "字",
+            TileType.FLOWER: "花"
+        }
+
+        flower_characters = {
+            1: "梅",
+            2: "蘭",
+            3: "菊",
+            4: "竹",
+            5: "春",
+            6: "夏",
+            7: "秋",
+            8: "冬",
         }
 
         faan_characters = {
@@ -104,6 +118,8 @@ class Tile:
 
         try:
             match self.tile_type:
+                case TileType.FLOWER:
+                    return f"{flower_characters[self.tile_value]}"
                 case TileType.FAAN:
                     return f"{faan_characters[self.tile_value]}"
                 case TileType.SOK | TileType.TUNG | TileType.MAAN:
@@ -127,4 +143,20 @@ if __name__ == "__main__":
     print(tile.tile_type)  
     print(tile.tile_string)
     print(tile.to_unicode())
+    print()
 
+    tile = Tile.from_string("7z")
+    print(tile)  
+    print(tile.tile_value)
+    print(tile.tile_type)  
+    print(tile.tile_string)
+    print(tile.to_unicode())
+    print()
+
+    tile = Tile.from_string("8z")
+    print(tile)  
+    print(tile.tile_value)
+    print(tile.tile_type)  
+    print(tile.tile_string)
+    print(tile.to_unicode())
+    print()

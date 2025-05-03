@@ -22,6 +22,7 @@ class Meld:
         self.tiles = sorted(tiles)
         self.meld_type = self.determine_meld_type(tiles)
         self.tile_type = self.tiles[0].tile_type
+        self.is_open = any(tile.is_open for tile in tiles)
 
         if not self.meld_type:
             raise ValueError("Invalid meld: {}".format(self))

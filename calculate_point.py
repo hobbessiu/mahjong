@@ -1,23 +1,36 @@
 from calculate import split_to_groups
-from character_combinations import get_character_combinations
 from tiles import Tile
+from combinations.character_combinations import get_character_combinations
+from combinations.combo_combination import get_combo_combinations
+from combinations.dragon_combinations import get_dragon_combinations
+
+def get_all_combinations():
+    for combo in get_combo_combinations():
+        yield combo
+
+    for character in get_character_combinations():
+        yield character
+
+    for dragon in get_dragon_combinations():
+        yield dragon
 
 def calculate(mahjong_hand):
     result = split_to_groups(mahjong_hand)
-    for m, e in result:
-        print(m, e)
+    for m, e, f in result:
+        print(m, e, f)
         points = []
-        for combination in get_character_combinations():
-            s = combination.evaluate(m, e)
+        for combination in get_all_combinations():
+            s = combination.evaluate(m, e, f)
             if s and len(s) > 0:
                 points.extend(s)
+        res = points.copy()
         for point in points:
             if point.exclusions:
                 for exclusion in point.exclusions:
-                    if exclusion in points:
-                        points.remove(exclusion)
+                    if exclusion in res:
+                        res.remove(exclusion)
 
-    return points
+    return res
 
 def calculate_from_unicode(mahjong_hand_unicode):
     mahjong_hand = [Tile.from_unicode(tile) for tile in mahjong_hand_unicode]
