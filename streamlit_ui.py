@@ -16,7 +16,7 @@ if 'result' not in st.session_state:
 
 def tile_to_html(tile: Tile):
     button_style = "background-color: black; color: white;" if not (tile.is_open or tile.tile_type == TileType.FLOWER) else "background-color: white; color: black;"
-    return f'<div style="{button_style} padding: 10px; display: inline-block; border: 1px solid #ccc; border-radius: 5px; text-align: center;">{tile.to_unicode()}</div>'
+    return f'<div style="{button_style} font-size: 40px; height: 45px; display: flex; justify-content: center; align-items: center; border: 1px solid #ccc; border-radius: 5px; text-align: center;">{tile.to_unicode()}</div>'
 
 def hand_to_html(tiles: list[Tile]):
     hand =  ''.join([tile_to_html(tile) for tile in tiles])
@@ -47,6 +47,28 @@ def print_all_character_combinations():
         explain_cols[1].write(point)
 
 st.button('明' if st.session_state['is_open'] else '暗', on_click=lambda: st.session_state.update(is_open= not st.session_state['is_open']))
+
+st.write('''
+    <style>
+    [data-testid="column"] {
+        flex: 0 0 auto !important; /* Prevent columns from resizing */
+        width: calc(5s0% - 1rem); /* Fixed width based on proportions */
+        min-width: calc(20% - 1rem) !important;
+    }
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-wrap: nowrap !important; /* Prevent wrapping of columns */
+    }
+    body {
+        overflow-x: auto !important; /* Allow horizontal scrolling if needed */
+    }
+    [data-testid="stVerticalBlock"] {
+        width: 100px ;
+        flex: 1 1 calc(20% - 1rem) !important;
+        min-width: calc(20% - 1rem) !important;
+    }
+    </style>
+    ''', unsafe_allow_html=True)
 
 cols = st.columns(9)
 for i, c in enumerate(cols):
