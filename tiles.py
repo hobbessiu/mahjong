@@ -15,10 +15,11 @@ class Tile:
             TileType.FAAN: '🀀🀁🀂🀃🀄🀅🀆',
             TileType.FLOWER: '🀢🀣🀥🀤🀦🀧🀨🀩'}
     
-    def __init__(self, tile_value: int, tile_type: TileType, is_open: bool = False):
+    def __init__(self, tile_value: int, tile_type: TileType, is_open: bool = False, is_scoring_tile: bool = False):
         self.tile_value = tile_value
         self.tile_type = tile_type
         self.is_open = is_open
+        self.is_scoring_tile = is_scoring_tile
         self.tile_string = str(tile_value) + tile_type.value
     
     @classmethod
@@ -38,6 +39,9 @@ class Tile:
 
     def set_open(self):
         self.is_open = True
+    
+    def set_scoring_tile(self):
+        self.is_scoring_tile = True
 
     def next_tile(self):
         if self.tile_type == TileType.FAAN or self.tile_type == TileType.FLOWER:
