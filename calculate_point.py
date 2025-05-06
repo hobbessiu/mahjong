@@ -6,6 +6,7 @@ from combinations.dragon_combinations import get_dragon_combinations
 from combinations.terminal_combinations import get_terminal_combinations
 from combinations.three_colour_combinations import get_three_colour_combinations
 from combinations.one_colour_combinations import get_one_colour_combinations
+from combinations.flower_combinations import get_flower_combinations
 
 def get_all_combinations():
     for combo in get_combo_combinations():
@@ -25,15 +26,18 @@ def get_all_combinations():
     
     for one_colour in get_one_colour_combinations():
         yield one_colour
+    
+    for flower in get_flower_combinations():
+        yield flower
 
-def calculate(mahjong_hand):
-    result = split_to_groups(mahjong_hand)
+def calculate(mahjong_hand, open_melds, position: int = 1):
+    result = split_to_groups(mahjong_hand, open_melds)
     score_combinations = []
     for m, e, f in result:
         print(m, e, f)
         points = []
         for combination in get_all_combinations():
-            s = combination.evaluate(m, e, f)
+            s = combination.evaluate(m, e, f, position)
             if s and len(s) > 0:
                 points.extend(s)
         res = points.copy()

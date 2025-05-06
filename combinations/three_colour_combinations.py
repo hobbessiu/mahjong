@@ -11,7 +11,7 @@ class Neibourhood(PointCombination):
         point = 3
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 2:
@@ -30,7 +30,7 @@ class Three_neibourhood(PointCombination):
         remark = "10/20"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
@@ -60,9 +60,9 @@ class DoubleSister(PointCombination):
         point = 10
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
-        neibourhoods = Neibourhood().evaluate(melds, eye, flowers)
+        neibourhoods = Neibourhood().evaluate(melds, eye, flowers, position)
         if len(neibourhoods) < 2:
             return res
         for i in range(len(neibourhoods) - 1):
@@ -81,7 +81,7 @@ class AllSister(PointCombination):
         remark = "另計平糊，可另計三相逢"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         neibourhoods_dict = {}
         if len(chows) < 5:
@@ -106,7 +106,7 @@ class Stair(PointCombination):
         remark = "另計平糊，可另計步步高/二步高"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 5:
             return []
@@ -119,7 +119,7 @@ class Stair(PointCombination):
 
 
 def get_brother(brother_class, melds, eye):
-    pongs = [meld for meld in melds if meld.meld_type == MeldType.PONG and meld.tile_type != TileType.FAAN]
+    pongs = [meld for meld in melds if meld.is_pong_or_kong() and meld.tile_type != TileType.FAAN]
     pong_count_dict = {Brother().__class__.__name__: [], SmallThreeBrother().__class__.__name__: [], BigThreeBrother().__class__.__name__: []}
 
     while pongs:
@@ -144,7 +144,7 @@ class Brother(PointCombination):
         point = 5
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         combinations = get_brother(self, melds, eye)
         for c in combinations:
@@ -158,7 +158,7 @@ class SmallThreeBrother(PointCombination):
         point = 10
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         combinations = get_brother(self, melds, eye)
         for c in combinations:
@@ -172,7 +172,7 @@ class BigThreeBrother(PointCombination):
         point = 15
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         combinations = get_brother(self, melds, eye)
         for c in combinations:
@@ -187,7 +187,7 @@ class StepUp(PointCombination):
         remark = "5/10"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
@@ -196,7 +196,7 @@ class StepUp(PointCombination):
         for chow in chows:
             next_chows = [c for c in chows if c.tiles[0].tile_value == chow.tiles[0].tile_value + 1 and c.tiles[0].tile_type != chow.tiles[0].tile_type]
             for next_chow in next_chows:
-                next_next_chows = [c for c in chows if c.tiles[0].tile_value == next_chow.tiles[0].tile_value + 1 and c.tiles[0].tile_type != next_chow.tiles[0].tile_type and c.tiles[0].tile_value != chow.tiles[0].tile_value]
+                next_next_chows = [c for c in chows if c.tiles[0].tile_value == next_chow.tiles[0].tile_value + 1 and c.tiles[0].tile_type != next_chow.tiles[0].tile_type]
                 for next_next_chow in next_next_chows:
                     used_melds = [chow, next_chow, next_next_chow]
                     is_open = any(meld.is_open for meld in used_melds)
@@ -212,7 +212,7 @@ class TwoStepUp(PointCombination):
         remark = "5/10"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
@@ -221,7 +221,7 @@ class TwoStepUp(PointCombination):
         for chow in chows:
             next_chows = [c for c in chows if c.tiles[0].tile_value == chow.tiles[0].tile_value + 2 and c.tiles[0].tile_type != chow.tiles[0].tile_type]
             for next_chow in next_chows:
-                next_next_chows = [c for c in chows if c.tiles[0].tile_value == next_chow.tiles[0].tile_value + 2 and c.tiles[0].tile_type != next_chow.tiles[0].tile_type and c.tiles[0].tile_value != chow.tiles[0].tile_value]
+                next_next_chows = [c for c in chows if c.tiles[0].tile_value == next_chow.tiles[0].tile_value + 2 and c.tiles[0].tile_type != next_chow.tiles[0].tile_type]
                 for next_next_chow in next_next_chows:
                     used_melds = [chow, next_chow, next_next_chow]
                     is_open = any(meld.is_open for meld in used_melds)

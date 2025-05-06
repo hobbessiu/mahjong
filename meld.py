@@ -6,13 +6,13 @@ from typing import List
 class MeldType(Enum):
     PONG = "PONG"
     CHOW = "CHOW"
-    # KONG = "KONG"
+    KONG = "KONG"
 
     def __str__(self):
         chinese_characters = {
             MeldType.PONG: "碰",
             MeldType.CHOW: "上",
-            # MeldType.KONG: "杠"
+            MeldType.KONG: "杠"
         }
         return chinese_characters.get(self, self.value)
 
@@ -46,7 +46,13 @@ class Meld:
                 return MeldType.PONG
             elif self.is_chow_valid(tiles):
                 return MeldType.CHOW
+        elif len(self.tiles) == 4:
+            if self.is_pong_valid(tiles):
+                return MeldType.KONG
         return None
+    
+    def is_pong_or_kong(self):
+        return self.meld_type == MeldType.PONG or self.meld_type == MeldType.KONG
     
     def __eq__(self, other):
         if not isinstance(other, Meld):

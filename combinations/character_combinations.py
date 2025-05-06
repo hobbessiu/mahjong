@@ -10,7 +10,7 @@ class NoCharacter(PointCombination):
         point = 1
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         if all(meld.tile_type != TileType.FAAN for meld in melds) and all(tile.tile_type != TileType.FAAN for tile in eye):
             res.append(self.score())
@@ -18,17 +18,18 @@ class NoCharacter(PointCombination):
 
 class PositionCharacter(PointCombination):
     """ 風/位"""
-    def __init__(self):
-        name = "風"
-        point = 1
+    def __init__(self, is_right_position = False):
+        name = f"{"正" if is_right_position else ""}風"
+        point = 2 if is_right_position else 1
         remark = "正風/位 + 1番"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         for meld in melds:
             if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value <= 4:
-                res.append(self.score(used_melds = [meld]))
+                is_right_position = meld.tiles[0].tile_value == position
+                res.append(PositionCharacter(is_right_position=is_right_position).score(used_melds = [meld]))
         return res
 
 class FaanCharacter(PointCombination):
@@ -38,7 +39,7 @@ class FaanCharacter(PointCombination):
         point = 2
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         for meld in melds:
             if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value >= 5:
@@ -52,7 +53,7 @@ class SmallThreeCharacter(PointCombination):
         point = 20
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         isThreeCharacter = lambda t: t.tile_type == TileType.FAAN and t.tile_value >= 5
 
@@ -74,7 +75,7 @@ class BigThreeCharacter(PointCombination):
         point = 40
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         isThreeCharacter = lambda t: t.tile_type == TileType.FAAN and t.tile_value >= 5
 
@@ -95,7 +96,7 @@ class SmallThreeDirection(PointCombination):
         point = 15
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -106,7 +107,8 @@ class SmallThreeDirection(PointCombination):
         if len(used_melds) == 2:
             exclusions = []
             for meld in used_melds:
-                exclusions.append(ScoredCombination(PositionCharacter(), used_melds = [meld]))
+                is_right_position = meld.tiles[0].tile_value == position
+                exclusions.append(ScoredCombination(PositionCharacter(is_right_position=is_right_position), used_melds = [meld]))
 
             res.append(self.score(used_melds = used_melds, used_eye = eye, exclusions = exclusions))
         return res
@@ -118,7 +120,7 @@ class BigThreeDirection(PointCombination):
         point = 30
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -127,7 +129,8 @@ class BigThreeDirection(PointCombination):
         if len(used_melds) == 3 and eye[0].tile_type != TileType.FAAN:
             exclusions = []
             for meld in used_melds:
-                exclusions.append(ScoredCombination(PositionCharacter(), used_melds = [meld]))
+                is_right_position = meld.tiles[0].tile_value == position
+                exclusions.append(ScoredCombination(PositionCharacter(is_right_position=is_right_position), used_melds = [meld]))
 
             res.append(self.score(used_melds = used_melds, exclusions = exclusions))
         return res
@@ -139,7 +142,7 @@ class SmallFourDirection(PointCombination):
         point = 60
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -148,7 +151,8 @@ class SmallFourDirection(PointCombination):
         if len(used_melds) == 3 and eye[0].tile_type == TileType.FAAN:
             exclusions = []
             for meld in used_melds:
-                exclusions.append(ScoredCombination(PositionCharacter(), used_melds = [meld]))
+                is_right_position = meld.tiles[0].tile_value == position
+                exclusions.append(ScoredCombination(PositionCharacter(is_right_position=is_right_position), used_melds = [meld]))
 
             res.append(self.score(used_melds = used_melds, used_eye = eye, exclusions = exclusions))
         return res
@@ -160,7 +164,7 @@ class BigFourDirection(PointCombination):
         point = 90
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         isDirection = lambda t: t.tile_type == TileType.FAAN and t.tile_value <= 4
 
@@ -169,7 +173,8 @@ class BigFourDirection(PointCombination):
         if len(used_melds) == 4:
             exclusions = []
             for meld in used_melds:
-                exclusions.append(ScoredCombination(PositionCharacter(), used_melds = [meld]))
+                is_right_position = meld.tiles[0].tile_value == position
+                exclusions.append(ScoredCombination(PositionCharacter(is_right_position=is_right_position), used_melds = [meld]))
 
             res.append(self.score(used_melds = used_melds, exclusions = exclusions))
         return res
@@ -181,13 +186,14 @@ class AllCharacter(PointCombination):
         point = 120
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         res = []
         if all(meld.tile_type == TileType.FAAN for meld in melds) and all(tile.tile_type == TileType.FAAN for tile in eye):
             exclusions = []
             for meld in melds:
                 if meld.tile_type == TileType.FAAN and meld.tiles[0].tile_value <= 4:
-                    exclusions.append(ScoredCombination(PositionCharacter(), used_melds = [meld]))
+                    is_right_position = meld.tiles[0].tile_value == position
+                    exclusions.append(ScoredCombination(PositionCharacter(is_right_position=is_right_position), used_melds = [meld]))
                 else:
                     exclusions.append(ScoredCombination(FaanCharacter(), used_melds = [meld]))
 

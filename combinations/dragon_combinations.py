@@ -30,7 +30,7 @@ class OpenTwoColourDragon(PointCombination):
         remark = "打出牌或已落地為明，全為手上牌為暗"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         dragons = get_dragons(melds, 2, True)
         res = []
         for dragon in dragons:
@@ -45,7 +45,7 @@ class CloseTwoColourDragon(PointCombination):
         remark = "打出牌或已落地為明，全為手上牌為暗"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         dragons = get_dragons(melds, 2, False)
         res = []
         for dragon in dragons:
@@ -60,7 +60,7 @@ class OpenThreeColourDragon(PointCombination):
         remark = "打出牌或已落地為明，全為手上牌為暗"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         dragons = get_dragons(melds, 3, True)
         res = []
         for dragon in dragons:
@@ -75,7 +75,7 @@ class CloseThreeColourDragon(PointCombination):
         remark = "打出牌或已落地為明，全為手上牌為暗"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         dragons = get_dragons(melds, 3, False)
         res = []
         for dragon in dragons:
@@ -90,7 +90,7 @@ class OpenSingleColourDragon(PointCombination):
         remark = "打出牌或已落地為明，全為手上牌為暗"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         dragons = get_dragons(melds, 1, True)
         res = []
         for dragon in dragons:
@@ -105,7 +105,7 @@ class CloseSingleColourDragon(PointCombination):
         remark = "打出牌或已落地為明，全為手上牌為暗"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers):
+    def evaluate(self, melds, eye, flowers, position):
         dragons = get_dragons(melds, 1, False)
         res = []
         for dragon in dragons:
