@@ -4,18 +4,18 @@ from itertools import combinations
 from meld import Meld
 from typing import List
 
-def split_to_groups(mahjong_hand: List[Tile]):
-    """
-    Splits the mahjong hand of 17 tiles into exactly 5 melds and one eye.
-    All tiles must be used.
-    group of 3 tile (meld): 3 identical tiles, or 3 consecutive tiles of the same type.
-    group of 2 tile (eye): 2 identical tiles.
+# def split_to_groups(mahjong_hand: List[Tile], open_melds: List[Meld] = []):
+#     """
+#     Splits the mahjong hand of 17 tiles into exactly 5 melds and one eye.
+#     All tiles must be used.
+#     group of 3 tile (meld): 3 identical tiles, or 3 consecutive tiles of the same type.
+#     group of 2 tile (eye): 2 identical tiles.
 
-    TODO: special cases like 7 pairs, 13 orphans, etc.
-    TODO: special cases when 4 tiles are the same.
-    Args:
-        mahjong_hand (list[str]): A list of 17 tiles represented as strings.
-    """
+#     TODO: special cases like 7 pairs, 13 orphans, etc.
+#     TODO: special cases when 4 tiles are the same.
+#     Args:
+#         mahjong_hand (list[str]): A list of 17 tiles represented as strings.
+#     """
 def is_meld(group):
     """Check if a group of 3 tiles is a valid meld."""
     if len(group) != 3:
@@ -35,7 +35,7 @@ def is_eye(group):
     """Check if a group of 2 tiles is a valid eye."""
     return len(group) == 2 and group[0] == group[1]
 
-def split_to_groups(mahjong_hand: List[Tile]):
+def split_to_groups(mahjong_hand: List[Tile], open_melds: List[Meld] = []):
     flowers = [tile for tile in mahjong_hand if tile.tile_type == TileType.FLOWER]
     mahjong_hand = [tile for tile in mahjong_hand if tile.tile_type != TileType.FLOWER]
     def extract_chow(current_tile, remaining_tiles, remaining_tiles_count):
@@ -57,7 +57,7 @@ def split_to_groups(mahjong_hand: List[Tile]):
     result = []
 
     """Split the mahjong hand into valid groups of melds and eyes."""
-    if len(mahjong_hand) != 17:
+    if len(mahjong_hand) + 3 * len(open_melds) != 17:
         raise ValueError("A mahjong hand must contain exactly 17 tiles.")
     
     tiles = sorted(mahjong_hand)
@@ -123,7 +123,8 @@ def split_to_groups(mahjong_hand: List[Tile]):
                     else:
                         extract_pong(current_tile, remaining_tiles, remaining_tiles_count)
             
-            if len(melds) == 5:
+            if len(melds) + len(open_melds) == 5:
+                melds += open_melds
                 melds.sort()
                 existing_melds = [m for m,e,f in result]
 

@@ -48,7 +48,7 @@ class Tile:
             return None
         if self.tile_value == 9:
             return None
-        return Tile(self.tile_value + 1, self.tile_type)
+        return Tile(tile_value=self.tile_value + 1, tile_type=self.tile_type, is_open=self.is_open)
 
     def __repr__(self):
         return self.to_unicode()
