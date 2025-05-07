@@ -12,7 +12,7 @@ class FourInOne(PointCombination):
         remark = "5/10"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         pongs = [meld for meld in melds if meld.is_pong_or_kong() and meld.tile_type != TileType.FAAN]
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
@@ -36,7 +36,7 @@ class FourInTwo(PointCombination):
         remark = "10/20"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if eye[0].tile_type == TileType.FAAN:
             return []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
@@ -62,7 +62,7 @@ class FourInFour(PointCombination):
         remark = "30/60"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 4:
             return []
@@ -84,7 +84,7 @@ class EightConsecutivePairs(PointCombination):
         point = 150
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if any(meld.tile_type == TileType.FAAN or meld.tile_type != melds[0].tile_type for meld in melds):
             return []
         tiles = [t for meld in melds for t in meld.tiles] + eye
@@ -108,7 +108,7 @@ class SameTypeNeibourhood(PointCombination):
         point = 5
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 2:
@@ -127,7 +127,7 @@ class SmallTwoNeibourhood(PointCombination):
         remark = "例：11223344"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if eye[0].tile_type == TileType.FAAN:
             return []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW and meld.tile_type == eye[0].tile_type]
@@ -156,8 +156,8 @@ class BigTwoNeibourhood(PointCombination):
         remark = "例：112233 667788"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
-        neibourhoods = SameTypeNeibourhood().evaluate(melds, eye, flowers, position)
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
+        neibourhoods = SameTypeNeibourhood().evaluate(melds, eye, flowers, position, seat)
         if len(neibourhoods) < 2:
             return []
         res = []
@@ -178,7 +178,7 @@ class SuperNeibourhood(PointCombination):
         remark = "20/40"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
             return []
@@ -201,7 +201,7 @@ class GrandNeibourhood(PointCombination):
         remark = "40/80"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 4:
             return []
@@ -225,7 +225,7 @@ class SameColourStepUp(PointCombination):
         remark = "10/20"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
@@ -250,7 +250,7 @@ class SameColourTwoStepUp(PointCombination):
         remark = "10/20"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
@@ -273,7 +273,7 @@ class MixedOneColour(PointCombination):
         point = 30
         super().__init__(name, point)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         tiles = [t for meld in melds for t in meld.tiles] + eye
         tiles_exclude_faan = [t for t in tiles if t.tile_type != TileType.FAAN]
         tile_types = set(t.tile_type for t in tiles_exclude_faan)
@@ -287,7 +287,7 @@ class AllOneColour(PointCombination):
         point = 80
         super().__init__(name, point)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         tiles = [t for meld in melds for t in meld.tiles] + eye
         tile_types = set(t.tile_type for t in tiles)
         if len(tile_types) == 1 and not TileType.FAAN in tile_types:
@@ -301,7 +301,7 @@ class AllGreen(PointCombination):
         remark = "另計清一色/混一色/嚦咕/對對"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         tiles = [t for meld in melds for t in meld.tiles] + eye
         green_tiles_str = ['2s', '3s', '4s', '6s', '8s', '6x']
         green_tiles = [Tile.from_string(t) for t in green_tiles_str]
@@ -332,7 +332,7 @@ class NineGate(PointCombination):
                 is_authentic = not any(t for t in tiles if t.is_scoring_tile and t.tile_value == tile_value)
         return [NineGate(is_authentic).score()]
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         
         if eye[0].tile_type == TileType.FAAN:
             return []

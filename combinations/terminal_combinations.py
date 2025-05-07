@@ -10,7 +10,9 @@ class AllTerminalAndChracter(PointCombination):
         point = 20
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
+        if eye[0].tile_type == TileType.FAAN and all(meld.tile_type == TileType.FAAN for meld in melds):
+            return []
 
         if not (eye[0].tile_type == TileType.FAAN or eye[0].tile_value in [1, 9]):
             return []
@@ -27,7 +29,7 @@ class AllTerminal(PointCombination):
         remark = "另帶缺五"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if eye[0].tile_type == TileType.FAAN or not eye[0].tile_value in [1, 9]:
             return []
         for meld in melds:
@@ -43,7 +45,7 @@ class MixOldHead(PointCombination):
         remark = "另計對對胡/嚦咕"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if eye[0].tile_type == TileType.FAAN and all(meld.tile_type == TileType.FAAN for meld in melds):
             return []
 
@@ -62,7 +64,7 @@ class AllOldHead(PointCombination):
         remark = "另計對對胡/嚦咕"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if eye[0].tile_type == TileType.FAAN or not eye[0].tile_value in [1, 9]:
             return []
         for meld in melds:
@@ -78,7 +80,7 @@ class PongOldAndYoung(PointCombination):
         remark = "同色111 999"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
 
         for meld in melds:
@@ -96,7 +98,7 @@ class ChowOldAndYoung(PointCombination):
         remark = "同色123 789"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
 
         for meld in melds:
@@ -113,7 +115,7 @@ class NoTerminal(PointCombination):
         point = 5
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         if eye[0].tile_type == TileType.FAAN or eye[0].tile_value in [1, 9]:
             return []
@@ -136,7 +138,7 @@ class AllWithOneTileOrCharacter(PointCombination):
             return self.name == value.name
         return False
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         if eye[0].tile_type == TileType.FAAN and all(meld.tile_type == TileType.FAAN for meld in melds):
             return []
@@ -164,7 +166,7 @@ class AllWithOneTile(PointCombination):
         remark = "1-9任一數字,沒有番子,每章包含X, 全帶1/9可另計全帶么"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         class StopLooping(Exception): pass
         for i in range(1, 10):
@@ -187,7 +189,7 @@ class NoFive(PointCombination):
         remark = "不能有番子"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         if eye[0].tile_type == TileType.FAAN or eye[0].tile_value == 5:
             return []

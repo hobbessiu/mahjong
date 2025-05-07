@@ -7,6 +7,9 @@ from combinations.terminal_combinations import get_terminal_combinations
 from combinations.three_colour_combinations import get_three_colour_combinations
 from combinations.one_colour_combinations import get_one_colour_combinations
 from combinations.flower_combinations import get_flower_combinations
+from combinations.scoring_combinations import get_scoring_combinations, ScroingInFakeSinglePossiblity, ScroingInSinglePossiblity
+from combinations.pong_kong_combinations import get_pong_kong_combinations
+from combinations.point_combination import ScoredCombination
 
 def get_all_combinations():
     for combo in get_combo_combinations():
@@ -29,15 +32,21 @@ def get_all_combinations():
     
     for flower in get_flower_combinations():
         yield flower
+    
+    for scoring in get_scoring_combinations():
+        yield scoring
+    
+    for pong_kong in get_pong_kong_combinations():
+        yield pong_kong
 
-def calculate(mahjong_hand, open_melds, position: int = 1):
+def calculate(mahjong_hand, open_melds, position: int = 1, seat: int = 1, **kwargs):
     result = split_to_groups(mahjong_hand, open_melds)
     score_combinations = []
     for m, e, f in result:
         print(m, e, f)
         points = []
         for combination in get_all_combinations():
-            s = combination.evaluate(m, e, f, position)
+            s = combination.evaluate(m, e, f, position, seat, **kwargs)
             if s and len(s) > 0:
                 points.extend(s)
         res = points.copy()

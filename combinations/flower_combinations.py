@@ -10,7 +10,7 @@ class NoFlower(PointCombination):
         point = 1
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if len(flowers) > 0:
             return []
         return [self.score()]
@@ -22,10 +22,10 @@ class RightFlower(PointCombination):
         point = 2
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         for flower in flowers:
-            if flower.tile_value % 4 == position:
+            if flower.tile_value % 4 == seat:
                 res.append(self.score(used_tiles = [flower]))
         return res
 
@@ -36,10 +36,10 @@ class WrongFlower(PointCombination):
         point = 1
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         for flower in flowers:
-            if flower.tile_value % 4 != position:
+            if flower.tile_value % 4 != seat:
                 res.append(self.score(used_tiles = [flower]))
         return res
 
@@ -50,7 +50,7 @@ class NoLetterAndFlower(PointCombination):
         point = 5
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         if len(flowers) > 0:
             return []
@@ -58,8 +58,38 @@ class NoLetterAndFlower(PointCombination):
             return []
         return [self.score(exclusions=[ScoredCombination(NoFlower())])]
 
+class SetOfFlower(PointCombination):
+    """一台花"""
+    def __init__(self):
+        name = "一台花"
+        point = 10
+        remark = "即收5番，食糊時計10番"
+        super().__init__(name, point, remark)
+    
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
+        res = []
+        flower_set_1 = [f for f in flowers if f.tile_value in [1, 2, 3, 4]]
+        flower_set_2 = [f for f in flowers if f.tile_value in [5, 6, 7, 8]]
+        if len(flower_set_1) == 4:
+            res.append(self.score(used_tiles=flower_set_1))
+        if len(flower_set_2) == 4:
+            res.append(self.score(used_tiles=flower_set_2))
+        return res
+
+class SetOfGrass(PointCombination):
+    """一台草"""
+    def __init__(self):
+        name = "一台草"
+        point = 3
+        remark = "即收3番"
+        super().__init__(name, point, remark)
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
+        return []
+
 def get_flower_combinations():
     yield NoFlower()
     yield RightFlower()
     yield WrongFlower()
     yield NoLetterAndFlower()
+    yield SetOfFlower()
+    yield SetOfGrass()
