@@ -39,11 +39,12 @@ def split_to_groups(mahjong_hand: List[Tile], open_melds: List[Meld] = []):
     flowers = [tile for tile in mahjong_hand if tile.tile_type == TileType.FLOWER]
     mahjong_hand = [tile for tile in mahjong_hand if tile.tile_type != TileType.FLOWER]
     def extract_chow(current_tile, remaining_tiles, remaining_tiles_count):
+        current = [t for t in remaining_tiles if t == current_tile][0]
         next_1 = [t for t in remaining_tiles if t == current_tile.next_tile()][0]
         next_2 = [t for t in remaining_tiles if t == current_tile.next_tile().next_tile()][0]
-        melds.append(Meld([current_tile, next_1, next_2]))
+        melds.append(Meld([current, next_1, next_2]))
         remaining_tiles_count.subtract([current_tile, current_tile.next_tile(), current_tile.next_tile().next_tile()])
-        remaining_tiles.remove(current_tile)
+        remaining_tiles.remove(current)
         remaining_tiles.remove(next_1)
         remaining_tiles.remove(next_2)
     

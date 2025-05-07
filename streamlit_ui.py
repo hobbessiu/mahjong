@@ -10,6 +10,8 @@ st.title('麻雀計番器')
 
 if 'is_score_from_other' not in st.session_state:
     st.session_state.is_score_from_other = False
+if 'is_score_from_dealer' not in st.session_state:
+    st.session_state.is_score_from_dealer = False
 if 'is_self_score' not in st.session_state:
     st.session_state.is_self_score = False
 if 'is_chow' not in st.session_state:
@@ -30,6 +32,14 @@ if 'input_queue' not in st.session_state:
     st.session_state.input_queue = []
 if 'position' not in st.session_state:
     st.session_state.position = 1
+if 'seat' not in st.session_state:
+    st.session_state.seat = 1
+if 'is_ding' not in st.session_state:
+    st.session_state.is_ding = False
+if 'consecutive_win' not in st.session_state:
+    st.session_state.consecutive_win = 0
+if 'scoring_dealer' not in st.session_state:
+    st.session_state.scoring_dealer = False
 
 st.session_state['all_tiles'] = st.session_state.hand + [tile for meld in st.session_state.open_melds for tile in meld.tiles]
 
@@ -51,6 +61,7 @@ def hand_to_html(tiles: list[Tile], open_melds: list[Meld]):
 def update_buttons_state(button_str):
     current = st.session_state[button_str]
     st.session_state.is_score_from_other = False
+    st.session_state.is_score_from_dealer = False
     st.session_state.is_self_score = False
     st.session_state.is_chow = False
     st.session_state.is_pong = False
@@ -69,10 +80,11 @@ def click_tile_button(tile_str):
             st.error("手牌已滿，無法再加入！")
             return
 
-    if any([t for t in st.session_state['all_tiles'] if t.is_scoring_tile]) and (st.session_state.is_self_score or st.session_state.is_score_from_other):
+    if any([t for t in st.session_state['all_tiles'] if t.is_scoring_tile]) and (st.session_state.is_self_score or st.session_state.is_score_from_other or st.session_state.is_score_from_dealer):
         st.error("已經有胡牌，無法再加入！")
         st.session_state.is_self_score = False
         st.session_state.is_score_from_other = False
+        st.session_state.is_score_from_dealer = False
         return
     
     t = Tile.from_unicode(tile_str)
@@ -136,6 +148,11 @@ def click_tile_button(tile_str):
         t.set_scoring_tile()
         t.is_open = True
         st.session_state.is_score_from_other = False
+    elif st.session_state.is_score_from_dealer:
+        t.set_scoring_tile()
+        t.is_open = True
+        st.session_state.is_score_from_dealer = False
+        st.session_state.scoring_dealer = True
 
     st.session_state['hand'].append(t)
     st.session_state.input_queue.append('hand')
@@ -144,7 +161,9 @@ def backspace():
     st.session_state.result = ''
     if st.session_state['input_queue']:
         last_input = st.session_state['input_queue'].pop()
-        st.session_state[last_input].pop()
+        item = st.session_state[last_input].pop()
+        if last_input == 'hand' and item.is_scoring_tile:
+            st.session_state.scoring_dealer = False
 
 def create_tile_button(c, tile_type: TileType, tile_value: int):
     label = f"$ \\large {Tile.unicode_dict[tile_type][tile_value]} $"
@@ -160,7 +179,7 @@ def on_calculate_click():
             st.error("食邊隻？")
             return
 
-        result = calculate(st.session_state['hand'], st.session_state['open_melds'], st.session_state['position'])
+        result = calculate(st.session_state['hand'], st.session_state['open_melds'], st.session_state['position'], st.session_state['seat'], is_ding=st.session_state['is_ding'], scoring_dealer=st.session_state['scoring_dealer'], consecutive_win=st.session_state['consecutive_win'])
         st.session_state['result'] = result
         st.write(f"計算結果: {sum([r.point_combination.point for r in result])} 番")
         for r in result:
@@ -174,14 +193,20 @@ def print_all_character_combinations():
         explain_cols[0].write(f'{name}{'' if remark is None else f" ({remark})"}')
         explain_cols[1].write(point)
 
-st.button('東南西北'[st.session_state['position']-1] + '圈', on_click=lambda: st.session_state.update(position=(st.session_state['position'] % 4) + 1))
-option_button_cols = st.columns(6)
-option_button_cols[0].button(':red[自摸]' if st.session_state['is_self_score'] else '自摸', on_click=lambda: st.session_state.update(is_self_score= not st.session_state['is_self_score'], is_score_from_other = False))
-option_button_cols[1].button(':red[食出]' if st.session_state['is_score_from_other'] else '食出', on_click=lambda: st.session_state.update(is_score_from_other= not st.session_state['is_score_from_other'], is_self_score = False))
-option_button_cols[2].button(':red[上]' if st.session_state['is_chow'] else '上', on_click=update_buttons_state, args=['is_chow'])
-option_button_cols[3].button(':red[碰]' if st.session_state['is_pong'] else '碰', on_click=update_buttons_state, args=['is_pong'])
-option_button_cols[4].button(':red[明槓]' if st.session_state['is_open_kong'] else '明槓', on_click=update_buttons_state, args=['is_open_kong'])
-option_button_cols[5].button(':red[暗槓]' if st.session_state['is_close_kong'] else '暗槓', on_click=update_buttons_state, args=['is_close_kong'])
+position_col = st.columns(4)
+position_col[0].button('東南西北'[st.session_state['position']-1] + '圈', on_click=lambda: st.session_state.update(position=(st.session_state['position'] % 4) + 1, consecutive_win=0))
+position_col[1].button('東南西北'[st.session_state['seat']-1] + '位', on_click=lambda: st.session_state.update(seat=(st.session_state['seat'] % 4) + 1, consecutive_win=0))
+position_col[2].button(f'連{st.session_state['consecutive_win']}', on_click=lambda: st.session_state.update(consecutive_win=(st.session_state['consecutive_win'] + 1)))
+position_col[3].button(':red[叮左]' if st.session_state['is_ding'] else '冇叮', on_click=lambda: st.session_state.update(is_ding= not st.session_state['is_ding']))
+
+option_button_cols = st.columns(7)
+option_button_cols[0].button(':red[自摸]' if st.session_state['is_self_score'] else '自摸', on_click=lambda: st.session_state.update(is_self_score= not st.session_state['is_self_score'], is_score_from_other = False, is_score_from_dealer = False))
+option_button_cols[1].button(':red[食出]' if st.session_state['is_score_from_other'] else '食出', on_click=lambda: st.session_state.update(is_score_from_other= not st.session_state['is_score_from_other'], is_self_score = False, is_score_from_dealer = False))
+option_button_cols[2].button(':red[食莊]' if st.session_state['is_score_from_dealer'] else '食莊', on_click=lambda: st.session_state.update(is_score_from_dealer= not st.session_state['is_score_from_dealer'], is_self_score = False, is_score_from_other = False))
+option_button_cols[3].button(':red[上]' if st.session_state['is_chow'] else '上', on_click=update_buttons_state, args=['is_chow'])
+option_button_cols[4].button(':red[碰]' if st.session_state['is_pong'] else '碰', on_click=update_buttons_state, args=['is_pong'])
+option_button_cols[5].button(':red[明槓]' if st.session_state['is_open_kong'] else '明槓', on_click=update_buttons_state, args=['is_open_kong'])
+option_button_cols[6].button(':red[暗槓]' if st.session_state['is_close_kong'] else '暗槓', on_click=update_buttons_state, args=['is_close_kong'])
 
 st.write('''
     <style>

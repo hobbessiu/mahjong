@@ -4,6 +4,7 @@ from meld import Meld, MeldType
 from combinations.point_combination import PointCombination, ScoredCombination
 from combinations.character_combinations import NoCharacter
 from combinations.flower_combinations import NoLetterAndFlower
+from combinations.scoring_combinations import SelfScoring, ScroingInSinglePossiblity
 
 class AllChow(PointCombination):
     """平胡"""
@@ -12,7 +13,7 @@ class AllChow(PointCombination):
         point = 5
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         if all(meld.meld_type == MeldType.CHOW for meld in melds):
             res.append(self.score())
@@ -26,7 +27,7 @@ class AllChowNoLetterAndFlower(PointCombination):
         remark = "不另計平胡/無字花"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         if all(meld.meld_type == MeldType.CHOW for meld in melds) and eye[0].tile_type != TileType.FAAN and len(flowers) == 0:
             res.append(self.score(exclusions = [ScoredCombination(NoCharacter()), ScoredCombination(AllChow()), ScoredCombination(NoLetterAndFlower())]))
@@ -40,7 +41,7 @@ class MissingOneTileType(PointCombination):
         remark = "不能有番子"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         tile_types = set(t.tile_type for t in melds + eye)
         if TileType.FAAN in tile_types:
@@ -72,7 +73,7 @@ class SmallAllFiveTileType(PointCombination):
         point = 8
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
 
         checks = get_all_five_types_checks()
@@ -97,7 +98,7 @@ class BigAllFiveTileType(PointCombination):
         point = 15
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         checks = get_all_five_types_checks()
         if all(check([m.tiles[0] for m in melds]) for check in checks):
@@ -111,7 +112,7 @@ class SmallAllSevenTileType(PointCombination):
         point = 10
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
 
         checks = get_all_five_types_checks()
@@ -134,7 +135,7 @@ class BigAllSevenTileType(PointCombination):
         point = 20
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         checks = get_all_five_types_checks()
         if all(check([m.tiles[0] for m in melds]) for check in checks):
@@ -150,9 +151,9 @@ class HalfFromOthers(PointCombination):
         remark = "不另計自摸/獨獨"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if all(m.is_open for m in melds):
-            return [self.score()]
+            return [self.score(exclusions=[ScoredCombination(SelfScoring()), ScoredCombination(ScroingInSinglePossiblity())])]
 
 class FullFromOthers(PointCombination):
     """全求人"""
@@ -161,9 +162,9 @@ class FullFromOthers(PointCombination):
         point = 15
         remark = "不另計獨獨"
         super().__init__(name, point, remark)
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         if all(m.is_open for m in melds) and all(e.is_open for e in eye):
-            return [self.score(exclusions=[ScoredCombination(HalfFromOthers())])]
+            return [self.score(exclusions=[ScoredCombination(HalfFromOthers()), ScoredCombination(ScroingInSinglePossiblity())])]
 
 
 def get_combo_combinations():

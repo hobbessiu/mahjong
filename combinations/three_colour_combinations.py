@@ -11,7 +11,7 @@ class Neibourhood(PointCombination):
         point = 3
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 2:
@@ -30,7 +30,7 @@ class Three_neibourhood(PointCombination):
         remark = "10/20"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
@@ -60,9 +60,9 @@ class DoubleSister(PointCombination):
         point = 10
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
-        neibourhoods = Neibourhood().evaluate(melds, eye, flowers, position)
+        neibourhoods = Neibourhood().evaluate(melds, eye, flowers, position, seat)
         if len(neibourhoods) < 2:
             return res
         for i in range(len(neibourhoods) - 1):
@@ -81,7 +81,7 @@ class AllSister(PointCombination):
         remark = "另計平糊，可另計三相逢"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         neibourhoods_dict = {}
         if len(chows) < 5:
@@ -106,7 +106,7 @@ class Stair(PointCombination):
         remark = "另計平糊，可另計步步高/二步高"
         super().__init__(name, point, remark)
     
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 5:
             return []
@@ -144,7 +144,7 @@ class Brother(PointCombination):
         point = 5
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         combinations = get_brother(self, melds, eye)
         for c in combinations:
@@ -158,7 +158,7 @@ class SmallThreeBrother(PointCombination):
         point = 10
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         combinations = get_brother(self, melds, eye)
         for c in combinations:
@@ -172,7 +172,7 @@ class BigThreeBrother(PointCombination):
         point = 15
         super().__init__(name, point)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         combinations = get_brother(self, melds, eye)
         for c in combinations:
@@ -187,7 +187,7 @@ class StepUp(PointCombination):
         remark = "5/10"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:
@@ -212,7 +212,7 @@ class TwoStepUp(PointCombination):
         remark = "5/10"
         super().__init__(name, point, remark)
 
-    def evaluate(self, melds, eye, flowers, position):
+    def evaluate(self, melds, eye, flowers, position, seat, **kwargs):
         res = []
         chows = [meld for meld in melds if meld.meld_type == MeldType.CHOW]
         if len(chows) < 3:

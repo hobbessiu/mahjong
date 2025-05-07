@@ -22,7 +22,7 @@ class PointCombination:
     def score(self, used_melds: list[Meld] = None, used_eye: list[Tile] = None, exclusions = None, used_tiles: list[Tile] = None) -> 'ScoredCombination':
         return ScoredCombination(self, used_melds, used_eye, exclusions, used_tiles)
     
-    def evaluate(self, melds: list[Meld], eye: list[Tile], flowers: list[Tile], position: int) -> list['ScoredCombination']:
+    def evaluate(self, melds: list[Meld], eye: list[Tile], flowers: list[Tile], position: int, seat: int, **kwargs) -> list['ScoredCombination']:
         NotImplementedError(self.__class__.__name__ + " must implement evaluate method.")
 
 class ScoredCombination():
