@@ -71,9 +71,23 @@ class SetOfFlower(PointCombination):
         flower_set_1 = [f for f in flowers if f.tile_value in [1, 2, 3, 4]]
         flower_set_2 = [f for f in flowers if f.tile_value in [5, 6, 7, 8]]
         if len(flower_set_1) == 4:
-            res.append(self.score(used_tiles=flower_set_1))
+            exclusions_1 = []
+            for f_1 in flower_set_1:
+                if f_1.tile_value % 4 == seat:
+                    exclusions_1.append(ScoredCombination(RightFlower(), used_tiles=[f_1]))
+                else:
+                    exclusions_1.append(ScoredCombination(WrongFlower(), used_tiles=[f_1]))
+
+            res.append(self.score(used_tiles=flower_set_1, exclusions=exclusions_1))
+
         if len(flower_set_2) == 4:
-            res.append(self.score(used_tiles=flower_set_2))
+            exclusions_2 = []
+            for f_2 in flower_set_2:
+                if f_1.tile_value % 4 == seat:
+                    exclusions_2.append(ScoredCombination(RightFlower(), used_tiles=[f_2]))
+                else:
+                    exclusions_2.append(ScoredCombination(WrongFlower(), used_tiles=[f_2]))
+            res.append(self.score(used_tiles=flower_set_2, exclusions=exclusions_2))
         return res
 
 class SetOfGrass(PointCombination):

@@ -76,7 +76,7 @@ def click_tile_button(tile_str):
         return
 
     if tile_str not in Tile.unicode_dict[TileType.FLOWER]:
-        if len(st.session_state['hand']) + 3 * len(st.session_state['open_melds']) >= 17:
+        if get_check_count() >= 17:
             st.error("手牌已滿，無法再加入！")
             return
 
@@ -89,7 +89,7 @@ def click_tile_button(tile_str):
     
     t = Tile.from_unicode(tile_str)
     if st.session_state.is_chow:
-        if len(st.session_state['hand']) + 3 * len(st.session_state['open_melds']) > 14:
+        if get_check_count() > 14:
             st.error("手牌已滿，無法再加入！")
             return
         if not t.next_tile() or not t.next_tile().next_tile():
@@ -109,7 +109,7 @@ def click_tile_button(tile_str):
         st.session_state.input_queue.append('open_melds')
         return
     elif st.session_state.is_pong:
-        if len(st.session_state['hand']) + 3 * len(st.session_state['open_melds']) > 14:
+        if get_check_count() > 14:
             st.error("手牌已滿，無法再加入！")
             return
         t.set_open()
@@ -124,7 +124,7 @@ def click_tile_button(tile_str):
         st.session_state.input_queue.append('open_melds')
         return
     elif st.session_state.is_open_kong or st.session_state.is_close_kong:
-        if len(st.session_state['hand']) + 3 * len(st.session_state['open_melds']) > 14:
+        if get_check_count() > 14:
             st.error("手牌已滿，無法再加入！")
             return
         if st.session_state.is_open_kong:
@@ -169,9 +169,13 @@ def create_tile_button(c, tile_type: TileType, tile_value: int):
     label = f"$ \\large {Tile.unicode_dict[tile_type][tile_value]} $"
     c.button(label, on_click=click_tile_button, args=Tile.unicode_dict[tile_type][tile_value], help=str(Tile.from_unicode(Tile.unicode_dict[tile_type][tile_value])))
 
+def get_check_count():
+    close_tiles = [t for t in st.session_state['hand'] if t.tile_type != TileType.FLOWER]
+    return len(close_tiles) + 3 * len(st.session_state['open_melds'])
+
 def on_calculate_click():
     try:
-        check_count = len(st.session_state['hand']) + 3 * len(st.session_state['open_melds'])
+        check_count = get_check_count()
         if check_count != 17:
             st.error(f"未夠牌，差{17 - check_count}張！")
             return
