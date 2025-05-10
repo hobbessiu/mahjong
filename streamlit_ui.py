@@ -3,6 +3,7 @@ from calculate_point import calculate
 from combinations.character_combinations import get_character_combinations_dict
 from tiles import *
 from meld import Meld
+from combinations.scoring_combinations import ScoreDealer, ConsecutiveWin
 
 st.set_page_config(page_title="麻雀計番器", page_icon="🀄")
 st.title('麻雀計番器')
@@ -185,7 +186,16 @@ def on_calculate_click():
 
         result = calculate(st.session_state['hand'], st.session_state['open_melds'], st.session_state['position'], st.session_state['seat'], is_ding=st.session_state['is_ding'], scoring_dealer=st.session_state['scoring_dealer'], consecutive_win=st.session_state['consecutive_win'])
         st.session_state['result'] = result
-        st.write(f"計算結果: {sum([r.point_combination.point for r in result])} 番")
+        total_point = sum([r.point_combination.point for r in result])
+        # 自摸
+        if not [h for h in st.session_state['hand'] if h.is_scoring_tile][0].is_open:
+            dealer_combinations = [ConsecutiveWin(st.session_state['consecutive_win']).score()] + [ScoreDealer().score()]
+            dealer_point = sum([r.point_combination.point for r in dealer_combinations]) + total_point
+            result += dealer_combinations
+            
+            st.write(f"計算結果: {total_point}/{dealer_point} 番")
+        else :
+            st.write(f"計算結果: {total_point} 番")
         for r in result:
             st.write(r)
     except Exception as e:

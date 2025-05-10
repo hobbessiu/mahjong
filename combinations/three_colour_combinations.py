@@ -200,7 +200,8 @@ class StepUp(PointCombination):
                 for next_next_chow in next_next_chows:
                     used_melds = [chow, next_chow, next_next_chow]
                     is_open = any(meld.is_open for meld in used_melds)
-                    res.append(StepUp(is_open=is_open).score(used_melds = used_melds))
+                    if len(set(m.tile_type for m in used_melds)) == 3:
+                        res.append(StepUp(is_open=is_open).score(used_melds = used_melds))
         
         return res
 
