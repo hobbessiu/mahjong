@@ -119,3 +119,7 @@ def get_dragon_combinations():
     yield CloseThreeColourDragon()
     yield OpenSingleColourDragon()
     yield CloseSingleColourDragon()
+
+def get_dragon_combinations_dict():
+    for combination in get_dragon_combinations():
+        yield combination.name, combination.point, combination.remark

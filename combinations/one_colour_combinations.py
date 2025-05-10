@@ -314,7 +314,8 @@ class NineGate(PointCombination):
     def __init__(self, is_authentic = False):
         name = f"{"純正" if is_authentic else ""}九蓮寶燈"
         point = 60 if is_authentic else 50
-        super().__init__(name, point)
+        remark = "1112345678999, 50 /純正 60"
+        super().__init__(name, point, remark)
     
     def examine_nine_gate( matching_melds, eye):
         is_authentic = False
@@ -373,3 +374,7 @@ def get_one_colour_combinations():
     yield AllOneColour()
     yield AllGreen()
     yield NineGate()
+
+def get_one_colour_combinations_dict():
+    for combination in get_one_colour_combinations():
+        yield combination.name, combination.point, combination.remark

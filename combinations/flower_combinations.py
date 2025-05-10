@@ -107,3 +107,7 @@ def get_flower_combinations():
     yield NoLetterAndFlower()
     yield SetOfFlower()
     yield SetOfGrass()
+
+def get_flower_combinations_dict():
+    for combination in get_flower_combinations():
+        yield combination.name, combination.point, combination.remark

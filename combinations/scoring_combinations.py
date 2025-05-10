@@ -214,3 +214,7 @@ def get_scoring_combinations():
     yield BaseScore()
     yield ConsecutiveWin()
     yield ScoreDealer()
+
+def get_scoring_combinations_dict():
+    for combination in get_scoring_combinations():
+        yield combination.name, combination.point, combination.remark

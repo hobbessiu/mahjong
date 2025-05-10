@@ -177,3 +177,7 @@ def get_combo_combinations():
     yield BigAllSevenTileType()
     yield HalfFromOthers()
     yield FullFromOthers()
+
+def get_combo_combinations_dict():
+    for combination in get_combo_combinations():
+        yield combination.name, combination.point, combination.remark
