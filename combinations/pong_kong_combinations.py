@@ -389,3 +389,7 @@ def get_pong_kong_combinations():
     yield BigFourConsecutivePong()
     yield SmallFiveConsecutivePong()
     yield BigFiveConsecutivePong()
+
+def get_pong_kong_combinations_dict():
+    for combination in get_pong_kong_combinations():
+        yield combination.name, combination.point, combination.remark

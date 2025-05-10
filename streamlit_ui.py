@@ -1,6 +1,15 @@
 import streamlit as st
 from calculate_point import calculate
 from combinations.character_combinations import get_character_combinations_dict
+from combinations.combo_combination import get_combo_combinations_dict
+from combinations.dragon_combinations import get_dragon_combinations_dict
+from combinations.flower_combinations import get_flower_combinations_dict
+from combinations.one_colour_combinations import get_one_colour_combinations_dict
+from combinations.scoring_combinations import get_scoring_combinations_dict
+from combinations.pong_kong_combinations import get_pong_kong_combinations_dict
+from combinations.scoring_combinations import get_scoring_combinations_dict
+from combinations.terminal_combinations import get_terminal_combinations_dict
+from combinations.three_colour_combinations import get_three_colour_combinations_dict
 from tiles import *
 from meld import Meld
 from combinations.scoring_combinations import ScoreDealer, ConsecutiveWin
@@ -41,6 +50,8 @@ if 'consecutive_win' not in st.session_state:
     st.session_state.consecutive_win = 0
 if 'scoring_dealer' not in st.session_state:
     st.session_state.scoring_dealer = False
+if 'explanations' not in st.session_state:
+    st.session_state.explanations = ''
 
 st.session_state['all_tiles'] = st.session_state.hand + [tile for meld in st.session_state.open_melds for tile in meld.tiles]
 
@@ -201,11 +212,16 @@ def on_calculate_click():
     except Exception as e:
         st.error(f"計算錯誤: {e}")
 
-def print_all_character_combinations():
+def print_all_combinations(get_func):
 
-    for name, point, remark in get_character_combinations_dict():
-        explain_cols[0].write(f'{name}{'' if remark is None else f" ({remark})"}')
-        explain_cols[1].write(point)
+    combinations = get_func()
+    table_html = "<table style='border-collapse: collapse; width: 100%;'>"
+    table_html += "<tr><th style='border: 1px solid black; padding: 8px;'>名稱</th><th style='border: 1px solid black; padding: 8px;'>番數</th><th style='border: 1px solid black; padding: 8px;'>備註</th></tr>"
+    for name, point, remark in combinations:
+        table_html += f"<tr><td style='border: 1px solid black; padding: 8px;'>{name}</td><td style='border: 1px solid black; padding: 8px;'>{point}</td><td style='border: 1px solid black; padding: 8px;'>{remark if remark else ''}</td></tr>"
+    table_html += "</table>"
+    st.session_state['explanations'] = table_html
+        
 
 position_col = st.columns(4)
 position_col[0].button('東南西北'[st.session_state['position']-1] + '圈', on_click=lambda: st.session_state.update(position=(st.session_state['position'] % 4) + 1, consecutive_win=0))
@@ -259,9 +275,22 @@ button_col = st.columns(3)
 calculate_click = button_col[0].button('計算')
 button_col[1].button('清除', on_click=lambda: st.session_state.update(hand=[], open_melds=[], result=''))
 button_col[2].button('⌫', on_click=backspace)
-st.button('字牌類', on_click=print_all_character_combinations)
+
 
 if calculate_click:
     on_calculate_click()
 
-explain_cols = st.columns(2)
+
+
+with st.sidebar:
+    st.button('字牌類', on_click=print_all_combinations, args=[get_character_combinations_dict])
+    st.button('組合類', on_click=print_all_combinations, args=[get_combo_combinations_dict])
+    st.button('花牌類', on_click=print_all_combinations, args=[get_flower_combinations_dict])
+    st.button('一色類', on_click=print_all_combinations, args=[get_one_colour_combinations_dict])
+    st.button('三色類', on_click=print_all_combinations, args=[get_three_colour_combinations_dict])
+    st.button('龍類', on_click=print_all_combinations, args=[get_dragon_combinations_dict])
+    st.button('刻槓類', on_click=print_all_combinations, args=[get_pong_kong_combinations_dict])
+    st.button('叫胡牌型類', on_click=print_all_combinations, args=[get_scoring_combinations_dict])
+    st.button('么九類', on_click=print_all_combinations, args=[get_terminal_combinations_dict])
+    st.markdown(st.session_state['explanations'], unsafe_allow_html=True)
+    

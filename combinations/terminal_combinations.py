@@ -209,4 +209,7 @@ def get_terminal_combinations():
     yield AllWithOneTileOrCharacter()
     yield AllWithOneTile()
     yield NoFive()
-    
+
+def get_terminal_combinations_dict():
+    for combination in get_terminal_combinations():
+        yield combination.name, combination.point, combination.remark

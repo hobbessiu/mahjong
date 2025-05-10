@@ -240,3 +240,7 @@ def get_three_colour_combinations():
     yield BigThreeBrother()
     yield StepUp()
     yield TwoStepUp()
+
+def get_three_colour_combinations_dict():
+    for combination in get_three_colour_combinations():
+        yield combination.name, combination.point, combination.remark
